@@ -9,16 +9,24 @@ const {
   RecentBlock,
 } = require("./../sdk/block.event");
 
+const { RecentTransaction } = require("./../sdk/transaction.event");
+
 let options = yargs
   .usage(
     "Usage: -n <network> -b <block> -h <height> -l <limit> -o <offset> -r <hash>"
   )
-  .usage("Usage: -n <network> -t <block>")
+  .usage("Usage: -n <network> -t <block> -l <limit> -o <offset> -ty <type>")
   .option("n", {
     alias: "network",
     describe: "testnet or mainnet or mocknet",
     type: "string",
     demandOption: true,
+  })
+  .option("ty", {
+    alias: "type",
+    describe:
+      "Items Enum: 'coinbase' 'token_transfer' 'smart_contract' 'contract_call' 'poison_microblock'",
+    type: "string",
   })
   .option("l", {
     alias: "limit",
@@ -42,10 +50,10 @@ let options = yargs
   }).argv;
 
 (async () => {
-  const { network, height, b, block, hash, limit, offset, t, transaction } =
-    options;
+  const { b, block, t, transaction } = options;
   // block
   if (b || block) {
+    const { network, height, hash, limit, offset } = options;
     if (height) {
       const res = await BlockByHeight(
         network == "mainnet"
@@ -83,5 +91,13 @@ let options = yargs
 
   if (t || transaction) {
     console.log("transactions");
+    const { network, limit, offset, type } = options;
+    const res = await RecentTransaction(
+      network == "mainnet" ? mainnet : network == "testnet" ? testnet : network,
+      limit,
+      offset,
+      type
+    );
+    console.log(res);
   }
 })();

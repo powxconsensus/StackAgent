@@ -3,8 +3,8 @@ module.exports = (fn) => {
     fn(req, res, next).catch((err) =>
       console.log({
         code: err.code,
-        status: err.response.status,
-        statusText: err.response.statusText,
+        status: err.response ? err.response.status : null,
+        statusText: err.response ? err.response.statusText : null,
       })
     );
   };
